@@ -17,9 +17,9 @@ This project serves as the core implementation for a Bachelor's Thesis in Inform
 
 This project is built as a **Monorepo** decoupling the client interface from the heavy AI inference engine, ensuring scalable performance and secure API routing.
 
-* **Frontend (`/ctia-gui`)**: A responsive, server-side rendered interface built with Next.js, React, TypeScript, and Tailwind CSS. Features a custom API Route (BFF) with strict rate-limiting (5 requests/minute) to prevent backend LLM overload.
+* **Frontend (`/ctia-gui`)**: A responsive, server-side rendered interface built with Next.js, React, TypeScript, and Tailwind CSS. Features a custom API Route (BFF) with strict rate-limiting to prevent backend LLM overload.
 * **Backend (`/ctia-be`)**: A robust Python/Flask microservice served via Waitress. It handles the vector database routing, prompt engineering, and LLM inference.
-* **AI Engine**: Utilizes **Qwen 2.5 / Llama 3.1** running locally via Ollama, paired with **BAAI/bge-m3** embeddings for multilingual, high-dimensional vector search.
+* **AI Engine**: Utilizes **Qwen 2.5** running locally via Ollama, paired with **BAAI/bge-m3** embeddings for multilingual, high-dimensional vector search.
 * **Database**: **ChromaDB** for persistent, local vector storage of cleaned CVE datasets and MITRE ATT&CK mitigation data.
 
 ## 📂 Repository Structure
