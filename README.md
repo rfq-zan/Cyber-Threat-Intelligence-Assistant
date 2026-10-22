@@ -1,36 +1,41 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🛡️ CTIA: Cyber Threat Intelligence Analysis Pipeline
 
-## Getting Started
+![Next.js](https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=next.js)
+![Python](https://img.shields.io/badge/Python-3.10+-blue?style=for-the-badge&logo=python)
+![Flask](https://img.shields.io/badge/Flask-Waitress-lightgrey?style=for-the-badge&logo=flask)
+![ChromaDB](https://img.shields.io/badge/ChromaDB-Vector_Store-orange?style=for-the-badge)
+![Ollama](https://img.shields.io/badge/Ollama-Qwen_2.5-white?style=for-the-badge)
+![Docker](https://img.shields.io/badge/Docker-Containerized-2496ED?style=for-the-badge&logo=docker)
 
-First, run the development server:
+A **Strict Modular Retrieval-Augmented Generation (RAG)** architecture designed to autonomously analyze, extract, and map CVE (Common Vulnerabilities and Exposures) records to the MITRE ATT&CK framework. 
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+This project serves as the core implementation for a Bachelor's Thesis in Information Systems at **Universitas Trunojoyo Madura**.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🏗️ System Architecture
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+This project is built as a **Monorepo** decoupling the client interface from the heavy AI inference engine, ensuring scalable performance and secure API routing.
 
-## Learn More
+* **Frontend (`/ctia-gui`)**: A responsive, server-side rendered interface built with Next.js, React, TypeScript, and Tailwind CSS. Features a custom API Route (BFF) with strict rate-limiting (5 requests/minute) to prevent backend LLM overload.
+* **Backend (`/ctia-be`)**: A robust Python/Flask microservice served via Waitress. It handles the vector database routing, prompt engineering, and LLM inference.
+* **AI Engine**: Utilizes **Qwen 2.5 / Llama 3.1** running locally via Ollama, paired with **BAAI/bge-m3** embeddings for multilingual, high-dimensional vector search.
+* **Database**: **ChromaDB** for persistent, local vector storage of cleaned CVE datasets and MITRE ATT&CK mitigation data.
 
-To learn more about Next.js, take a look at the following resources:
+## 📂 Repository Structure
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```text
+CTIA/
+├── ctia-be/                 # Backend AI Engine
+│   ├── core.py              # Flask API & LlamaIndex RAG Pipeline
+│   ├── requirements.txt     # Python Dependencies
+│   ├── Dockerfile           # GPU-Accelerated Container Build
+│
+├── ctia-gui/                # Frontend User Interface
+│   ├── app/                 # Next.js App Router & API Endpoints
+│   ├── components/          # Shadcn UI & Custom Components
+│   ├── package.json         # Node Dependencies
+│   └── Dockerfile           # Lightweight Node.js Container Build
+│
+├── docker-compose.yml       # Monorepo Orchestration
+└── README.md                # Project Documentation
