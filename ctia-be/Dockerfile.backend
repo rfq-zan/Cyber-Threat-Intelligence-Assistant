@@ -1,0 +1,33 @@
+# Use an official NVIDIA CUDA base image with Python
+FROM nvidia/cuda:12.2.0-runtime-ubuntu22.04
+
+# Set environment variables to prevent Python from buffering stdout/stderr
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+
+# Install Python and pip
+RUN apt-get update && apt-get install -y \
+    python3 \
+    python3-pip \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set the working directory
+WORKDIR /app
+
+# Copy dependency file and install
+COPY requirements.txt .
+RUN pip3 install --no-cache-dir -r requirements.txt
+
+# IMPORTANT: Download the HuggingFace embedding model during build time
+# so the container doesn't have to download it on every startup.
+RUN python3 -c "from huggingface_hub import snapshot_download; snapshot_download(repo_id='BAAI/bge-m3')"
+
+# Copy the core Python script and the ChromaDB folder
+COPY core.py .
+COPY chroma_db/ ./chroma_db/
+
+# Expose Waitress port
+EXPOSE 5000
+
+# Start the Waitress server
+CMD ["waitress-serve", "--port=5000", "core:app"]

@@ -1,0 +1,31 @@
+# Use official Node.js lightweight image
+FROM node:18-alpine AS builder
+
+WORKDIR /app
+
+# Install dependencies first (caching optimization)
+COPY package.json package-lock.json ./
+RUN npm ci
+
+# Copy the rest of the Next.js project
+COPY . .
+
+# Build the Next.js production output
+RUN npm run build
+
+# Production runtime stage
+FROM node:18-alpine AS runner
+WORKDIR /app
+
+ENV NODE_ENV production
+
+# Copy built assets from the builder stage
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
+
+# Expose the Next.js port
+EXPOSE 3000
+
+# Start Next.js server
+CMD ["node", "server.js"]
