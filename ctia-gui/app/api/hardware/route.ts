@@ -8,7 +8,7 @@ export async function GET() {
     });
 
     if (!flaskResponse.ok) {
-      return NextResponse.json({ error: "Hardware ping rejected by backend" }, { status: flaskResponse.status });
+      return NextResponse.json({ error: "Hardware ping got rejected by backend" }, { status: flaskResponse.status });
     }
 
     const data = await flaskResponse.json();

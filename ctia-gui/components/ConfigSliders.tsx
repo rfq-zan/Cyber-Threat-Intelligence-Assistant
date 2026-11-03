@@ -8,7 +8,6 @@ interface ConfigSlidersProps {
 }
 
 export default function ConfigSliders({ config, setConfig, disabled }: ConfigSlidersProps) {
-  // State untuk mengontrol apakah sidebar terbuka atau tertutup
   const [isOpen, setIsOpen] = useState(true);
 
   return (
@@ -25,7 +24,6 @@ export default function ConfigSliders({ config, setConfig, disabled }: ConfigSli
           </div>
         )}
         
-        {/* Tombol Lipat / Buka */}
         <button 
           onClick={() => setIsOpen(!isOpen)}
           className="p-1.5 hover:bg-neutral-800 rounded text-neutral-400 hover:text-neutral-200 transition-colors shrink-0"
@@ -35,7 +33,6 @@ export default function ConfigSliders({ config, setConfig, disabled }: ConfigSli
         </button>
       </div>
 
-      {/* Sliders Content - Hanya di-render ketika terbuka */}
       {isOpen && (
         <div className="flex flex-col gap-6 overflow-hidden whitespace-nowrap animate-in fade-in duration-300">
           

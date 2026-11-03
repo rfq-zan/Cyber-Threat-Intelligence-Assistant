@@ -1,20 +1,23 @@
 'use client';
 
-import { useRef, useEffect } from 'react';
-import { FiTerminal, FiShield, FiSend, FiLock } from 'react-icons/fi';
+import { useRef, useEffect, useState } from 'react';
+import { FiTerminal, FiShield, FiSend, FiLock, FiMenu } from 'react-icons/fi';
 import HardwareStats from '@/components/HardwareStats';
 import ConfigSliders from '@/components/ConfigSliders';
-import SessionSidebar from '@/components/SessionSidebar'; // NEW
+import SessionSidebar from '@/components/SessionSidebar'; 
 import { useChat } from '@/hooks/useChat';
 
 export default function SOCDashboard() {
   const { 
     input, setInput, messages, isProcessing, handleTransmit, 
     config, setConfig,
-    sessions, currentSessionId, createNewSession, loadSession // NEW
+    sessions, currentSessionId, createNewSession, loadSession,
+    deleteSession 
   } = useChat();
   
   const scrollRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -22,19 +25,45 @@ export default function SOCDashboard() {
     }
   }, [messages]);
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setInput(e.target.value);
+    if (textareaRef.current) {
+      textareaRef.current.style.height = '56px'; // Reset height
+      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 200)}px`; // Grow up to 200px
+    }
+  };
+
+  const submitQuery = () => {
+    if (isProcessing || !input.trim()) return;
+    handleTransmit();
+    if (textareaRef.current) {
+      textareaRef.current.style.height = '56px'; 
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-neutral-300 font-mono selection:bg-emerald-900 selection:text-emerald-100 flex flex-col">
+    <div className="h-screen overflow-hidden bg-[#0a0a0a] text-neutral-300 font-mono selection:bg-emerald-900 selection:text-emerald-100 flex flex-col">
       
-      <header className="border-b border-neutral-800 bg-[#0f0f0f] p-4 flex items-center justify-between shadow-md z-10">
+      <header className="border-b border-neutral-800 bg-[#0f0f0f] p-4 flex items-center justify-between shadow-md z-10 shrink-0">
         <div className="flex items-center gap-3">
+          <button 
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            className="p-2 text-neutral-400 hover:text-emerald-400 hover:bg-neutral-800 rounded transition-colors"
+            title="Toggle Sidebar"
+          >
+            <FiMenu className="w-5 h-5" />
+          </button>
+
           <div className="p-2 bg-emerald-950 border border-emerald-800 rounded">
             <FiShield className="w-5 h-5 text-emerald-500" />
           </div>
           <div>
-            <h1 className="text-sm font-bold tracking-widest text-neutral-100">CTIA // EDGE ANALYTICS</h1>
+            <h1 className="text-sm font-bold tracking-widest text-neutral-100">CTIA // LOCAL
+                ANALYTICS</h1>
             <p className="text-[10px] text-neutral-500 flex items-center gap-1 uppercase">
               <FiLock className="w-3 h-3" /> Air-Gapped Network
             </p>
+             
           </div>
         </div>
         <HardwareStats />
@@ -42,16 +71,16 @@ export default function SOCDashboard() {
 
       <div className="flex flex-1 overflow-hidden">
         
-        {/* User Session */}
         <SessionSidebar 
           sessions={sessions}
           currentSessionId={currentSessionId}
           onSelectSession={loadSession}
           onNewSession={createNewSession}
+          onDeleteSession={deleteSession}
+          isOpen={isSidebarOpen} 
         />
 
-        {/* Chat Display */}
-        <div className="flex-1 flex flex-col relative bg-[#0a0a0a]">
+        <div className="flex-1 flex flex-col relative bg-[#0a0a0a] min-w-0">
           <main ref={scrollRef} className="flex-1 overflow-y-auto p-6 space-y-6 scroll-smooth">
             {messages.map((msg, idx) => (
               <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
@@ -91,21 +120,27 @@ export default function SOCDashboard() {
             )}
           </main>
 
-          <footer className="p-4 bg-[#0f0f0f] border-t border-neutral-800">
-            <div className="max-w-4xl mx-auto relative">
-              <input
-                type="text"
+          <footer className="p-4 bg-[#0f0f0f] border-t border-neutral-800 shrink-0">
+            <div className="max-w-4xl mx-auto relative flex items-end">
+              <textarea
+                ref={textareaRef}
                 value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleTransmit()}
-                placeholder="Initialize query sequence (CVE / TTPs)..."
+                onChange={handleInputChange}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    submitQuery();
+                  }
+                }}
+                placeholder="Initialize query sequence... (Shift+Enter for new line)"
                 disabled={isProcessing}
-                className="w-full bg-black border border-neutral-800 rounded px-4 py-4 text-sm text-neutral-200 placeholder:text-neutral-700 focus:outline-none focus:border-emerald-700 focus:ring-1 focus:ring-emerald-900 transition-all disabled:opacity-50"
+                className="w-full bg-black border border-neutral-800 rounded px-4 py-4 pr-12 text-sm text-neutral-200 placeholder:text-neutral-700 focus:outline-none focus:border-emerald-700 focus:ring-1 focus:ring-emerald-900 transition-all disabled:opacity-50 resize-none overflow-y-auto"
+                style={{ height: '56px' }}
               />
               <button
-                onClick={handleTransmit}
+                onClick={submitQuery}
                 disabled={isProcessing || !input.trim()}
-                className="absolute right-2 top-2 p-2 bg-emerald-900 text-emerald-100 rounded hover:bg-emerald-800 disabled:opacity-50 disabled:hover:bg-emerald-900 transition-colors"
+                className="absolute right-2 bottom-2 p-2 bg-emerald-900 text-emerald-100 rounded hover:bg-emerald-800 disabled:opacity-50 disabled:hover:bg-emerald-900 transition-colors"
               >
                 <FiSend className="w-4 h-4" />
               </button>
@@ -113,9 +148,7 @@ export default function SOCDashboard() {
           </footer>
         </div>
         
-        {/* Document Slider */}
         <ConfigSliders config={config} setConfig={setConfig} disabled={isProcessing} />
-
       </div>
     </div>
   );

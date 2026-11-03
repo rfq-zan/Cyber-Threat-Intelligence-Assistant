@@ -26,7 +26,7 @@ export async function POST(request: Request) {
             { 
               answer: "> [SECURITY BREACH DETECTED]: Traffic anomaly detected. Rate limit exceeded (Max 5 req/min). Connection temporarily suspended to protect inference hardware.", 
               status: "blocked",
-              topic_summary: "RATE_LIMIT_EXCEEDED"
+              topic_summary: "RATE_LIMIT_EXCEEDED - Potential attack mitigated. Connection temporarily blocked."
             }, 
             { status: 429 }
           );

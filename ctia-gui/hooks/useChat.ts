@@ -27,8 +27,6 @@ export function useChat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [history, setHistory] = useState<ChatTurn[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
-  
-  // User History & Session Management
   const [sessions, setSessions] = useState<Session[]>([]);
   const [currentSessionId, setCurrentSessionId] = useState<string>('');
 
@@ -149,9 +147,23 @@ export function useChat() {
     }
   };
 
+  const deleteSession = (id: string) => {
+    setSessions(prev => prev.filter(s => s.id !== id));
+    if (currentSessionId === id) {
+      const remainingSessions = sessions.filter(s => s.id !== id);
+      if (remainingSessions.length > 0) {
+        loadSession(remainingSessions[0].id, remainingSessions);
+      } else {
+        setCurrentSessionId('');
+        setMessages([]);
+        setHistory([]);
+      }
+    }
+  };
+
   return { 
     input, setInput, messages, isProcessing, handleTransmit, 
     config, setConfig, 
-    sessions, currentSessionId, createNewSession, loadSession 
+    sessions, currentSessionId, createNewSession, loadSession, deleteSession
   };
 }
