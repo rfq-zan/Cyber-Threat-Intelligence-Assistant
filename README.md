@@ -46,6 +46,7 @@ This project is built as a **Monorepo** decoupling the client interface from the
 * **Node.js** (v18+)
 * **Python** (3.10+)
 * **Ollama** installed on the host machine (running Qwen 2.5)
+### (OPTIONAL)
 * **NVIDIA GPU** (RTX 3050 Ti or higher recommended) for CUDA acceleration.
 
 ### Option A: Run via Docker (Recommended)
